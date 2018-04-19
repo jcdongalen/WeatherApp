@@ -7,6 +7,7 @@ public class WeatherDetails {
     private List<Weather> weather;
     private String name;
     private Main main;
+    private Sys sys;
 
     public Coord getCoord() {
         return coord;
@@ -38,6 +39,14 @@ public class WeatherDetails {
 
     public void setMain(Main main) {
         this.main = main;
+    }
+
+    public Sys getSys() {
+        return sys;
+    }
+
+    public void setSys(Sys sys) {
+        this.sys = sys;
     }
 
     public class Coord{
@@ -145,6 +154,63 @@ public class WeatherDetails {
 
         public void setTemp_max(float temp_max) {
             this.temp_max = temp_max;
+        }
+    }
+
+    public class Sys{
+        private int type;
+        private int id;
+        private float message;
+        private String country;
+        private float sunrise;
+        private float sunset;
+
+        public int getType() {
+            return type;
+        }
+
+        public void setType(int type) {
+            this.type = type;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
+        }
+
+        public float getMessage() {
+            return message;
+        }
+
+        public void setMessage(float message) {
+            this.message = message;
+        }
+
+        public String getCountry() {
+            return country;
+        }
+
+        public void setCountry(String country) {
+            this.country = country;
+        }
+
+        public float getSunrise() {
+            return sunrise;
+        }
+
+        public void setSunrise(float sunrise) {
+            this.sunrise = sunrise;
+        }
+
+        public float getSunset() {
+            return sunset;
+        }
+
+        public void setSunset(float sunset) {
+            this.sunset = sunset;
         }
     }
 }
