@@ -2,7 +2,7 @@
     <string name="app_name">WeatherApp</string>
     <string name="openweather_api_key">96bd3bd1c44d8a39187cfb5d7a381d1f</string>
     <string name="api_get_weather_by_city">http://api.openweathermap.org/data/2.5/weather?q=%s&amp;units=metric&amp;appid=%s</string>
-    <string name="api_get_weather_by_latlon">http://api.openweathermap.org/data/2.5/weather?lat=%s&amp;lon=%s&amp;appid=%s</string>
+    <string name="api_get_weather_by_latlon">http://api.openweathermap.org/data/2.5/weather?lat=%s&amp;lon=%s&amp;units=metric&amp;appid=%s</string>
     <string name="api_weather_icon">http://openweathermap.org/img/w/%s.png</string>
     <string name="label_celcius">%s°c</string>
     <string name="label_farengeight">%s°f</string>

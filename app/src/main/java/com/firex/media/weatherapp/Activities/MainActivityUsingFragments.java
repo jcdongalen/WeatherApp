@@ -35,6 +35,8 @@ import com.firex.media.weatherapp.Utils.MyVolleySingleton;
 
 public class MainActivityUsingFragments extends AppCompatActivity implements ButtonRefresh.OnClickListener {
 
+    private static final int REQUEST_PERMISSION_LOCATION = 1000;
+
     private FragmentTransaction mFragmentTransaction;
     private FragmentManager mFragmentManager;
     private ButtonRefresh fragButtonRefresh;
@@ -49,6 +51,8 @@ public class MainActivityUsingFragments extends AppCompatActivity implements But
         @Override
         public void onLocationChanged(Location location) {
             mLocation = location;
+            if(fabGotoMyWeather.getVisibility() != View.VISIBLE)
+                fabGotoMyWeather.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -58,12 +62,14 @@ public class MainActivityUsingFragments extends AppCompatActivity implements But
 
         @Override
         public void onProviderEnabled(String provider) {
-
+            if (provider.equalsIgnoreCase(LocationManager.GPS_PROVIDER))
+                fabGotoMyWeather.setVisibility(View.VISIBLE);
         }
 
         @Override
         public void onProviderDisabled(String provider) {
-
+            if (provider.equalsIgnoreCase(LocationManager.GPS_PROVIDER))
+                fabGotoMyWeather.setVisibility(View.GONE);
         }
     };
 
@@ -71,6 +77,37 @@ public class MainActivityUsingFragments extends AppCompatActivity implements But
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_using_fragments);
+
+        fabGotoMyWeather = findViewById(R.id.fabGotoMyWeather);
+        fabGotoMyWeather.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mLocation != null) {
+                    String url = String.format(getString(R.string.api_get_weather_by_latlon), String.valueOf(mLocation.getLatitude()), String.valueOf(mLocation.getLongitude()), getString(R.string.openweather_api_key));
+                    StringRequest myCurrentWeatherRequest = new StringRequest(Request.Method.GET, url,
+                            new Response.Listener<String>() {
+                                @Override
+                                public void onResponse(String response) {
+                                    WeatherDetails item = MainHelper.getGson().fromJson(response, WeatherDetails.class);
+                                    if (item != null) {
+                                        Intent intent = new Intent(MainActivityUsingFragments.this, WeatherDetailActivity.class);
+                                        intent.putExtra("WeatherDetail", MainHelper.getGson().toJson(item));
+                                        startActivity(intent);
+                                    } else
+                                        MainHelper.showToast(MainActivityUsingFragments.this, "No weather details found.", false);
+                                }
+                            },
+                            new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    MainHelper.showToast(MainActivityUsingFragments.this, "Failed to get your weather details. Please try again later.", false);
+                                }
+                            });
+                    MyVolleySingleton.getInstance(MainActivityUsingFragments.this).addToRequestQueue(myCurrentWeatherRequest);
+                } else
+                    MainHelper.showToast(MainActivityUsingFragments.this, "Please wait while LocationService is fetching your data.", true);
+            }
+        });
 
         mFragmentManager = getSupportFragmentManager();
         mFragmentTransaction = mFragmentManager.beginTransaction();
@@ -118,12 +155,12 @@ public class MainActivityUsingFragments extends AppCompatActivity implements But
     }
 
     private void setUpLocationService() {
-        mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        //Prepare for location request
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            MainHelper.showToast(this, "Please declined permmission for Location.", false);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_PERMISSION_LOCATION);
             return;
         }
-        //Prepare for location request
+        mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         mLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, Constans.LOCATION_REQUEST_DELAY, 10, locationListener);
         if (mLocation != null) {
@@ -131,31 +168,15 @@ public class MainActivityUsingFragments extends AppCompatActivity implements But
         }
     }
 
-    public void gotoWeatherDetails(View view) {
-        if (mLocation != null) {
-            String url = String.format(getString(R.string.api_get_weather_by_latlon), String.valueOf(mLocation.getLatitude()), String.valueOf(mLocation.getLongitude()), getString(R.string.openweather_api_key));
-            StringRequest myCurrentWeatherRequest = new StringRequest(Request.Method.GET, url,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            WeatherDetails item = MainHelper.getGson().fromJson(response, WeatherDetails.class);
-                            if(item!=null){
-                                Intent intent = new Intent(MainActivityUsingFragments.this, WeatherDetailActivity.class);
-                                intent.putExtra("WeatherDetail", MainHelper.getGson().toJson(item));
-                                startActivity(intent);
-                            }
-                            else
-                                MainHelper.showToast(MainActivityUsingFragments.this, "No weather details found.", false);
-                        }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            MainHelper.showToast(MainActivityUsingFragments.this, "Failed to get your weather details. Please try again later.", false);
-                        }
-                    });
-            MyVolleySingleton.getInstance(this).addToRequestQueue(myCurrentWeatherRequest);
-        } else
-            MainHelper.showToast(this, "Please wait while LocationService is fetching your data.", true);
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_PERMISSION_LOCATION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                setUpLocationService();
+            } else {
+                MainHelper.showToast(this, "Locaiton service permission has been declined", false);
+                fabGotoMyWeather.setVisibility(View.GONE);
+            }
+        }
     }
 }
