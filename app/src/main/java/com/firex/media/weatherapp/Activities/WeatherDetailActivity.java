@@ -16,11 +16,21 @@ import com.firex.media.weatherapp.Models.WeatherDetails;
 import com.firex.media.weatherapp.R;
 import com.firex.media.weatherapp.Utils.MainHelper;
 import com.firex.media.weatherapp.Utils.MyVolleySingleton;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
-public class WeatherDetailActivity extends AppCompatActivity {
+public class WeatherDetailActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private TextView tvInCelciusLarge, tvWeatherDescription, tvCelsiusAndFarenheight, tvLocation;
     private ImageView imgIcon;
+    private SupportMapFragment mapFragment;
+    private WeatherDetails item;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +43,8 @@ public class WeatherDetailActivity extends AppCompatActivity {
         tvWeatherDescription = findViewById(R.id.tvWeatherDescription);
         tvCelsiusAndFarenheight = findViewById(R.id.tvCelsiusAndFarenheight);
         tvLocation = findViewById(R.id.tvLocation);
-
+        mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapView);
+        mapFragment.getMapAsync(this);
         initializeData();
     }
 
@@ -52,7 +63,7 @@ public class WeatherDetailActivity extends AppCompatActivity {
     }
 
     private void initializeData() {
-        WeatherDetails item = MainHelper.getGson().fromJson(getIntent().getStringExtra("WeatherDetail"), WeatherDetails.class);
+        item = MainHelper.getGson().fromJson(getIntent().getStringExtra("WeatherDetail"), WeatherDetails.class);
         if (item != null) {
             String icon_url = String.format(getString(R.string.api_weather_icon), item.getWeather().get(0).getIcon());
             ImageRequest iconRequest = new ImageRequest(icon_url,
@@ -75,5 +86,15 @@ public class WeatherDetailActivity extends AppCompatActivity {
             tvCelsiusAndFarenheight.setText(String.format(getString(R.string.label_celsiua_and_farenheight), MainHelper.getDecimalFormat(item.getMain().getTemp()), MainHelper.getDecimalFormat(MainHelper.Celcius_to_Farenheight(item.getMain().getTemp()))));
             tvLocation.setText(item.getName() + ", " + item.getSys().getCountry());
         }
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        if (item == null)
+            return;
+        LatLng location = new LatLng(item.getCoord().getLat(), item.getCoord().getLon());
+        googleMap.addMarker(new MarkerOptions().position(location).title(item.getName() + ", " + item.getSys().getCountry()));
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 10));
+        googleMap.getUiSettings().setScrollGesturesEnabled(false);
     }
 }

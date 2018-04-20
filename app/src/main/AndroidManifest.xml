@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
     <application
         android:allowBackup="true"
@@ -13,6 +15,15 @@
         android:supportsRtl="true"
         android:name=".WeatherApp"
         android:theme="@style/AppTheme">
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
+
         <activity
             android:name=".Activities.SplashScreen"
             android:theme="@style/AppThemeNoActionBar">
@@ -25,6 +36,9 @@
         <activity android:name=".Activities.MainActivity" />
         <activity android:name=".Activities.WeatherDetailActivity" />
         <activity android:name=".Activities.MainActivityUsingFragments"></activity>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="ebad372ed7ef1757c013d8a3a2ee58348cb91c1a" />
     </application>
 
 </manifest>

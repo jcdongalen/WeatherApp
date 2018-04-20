@@ -23,3 +23,9 @@
 -keepclassmembers class com.firex.media.weatherapp.** {
    *;
 }
+
+# Fabric proguard settings
+-keep class com.crashlytics.** { *; }
+-dontwarn com.crashlytics.**
+-keep public class * extends java.lang.Exception
+
