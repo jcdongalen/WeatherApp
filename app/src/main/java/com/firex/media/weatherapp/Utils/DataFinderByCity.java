@@ -13,6 +13,8 @@ import com.firex.media.weatherapp.R;
 
 import java.io.Closeable;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class DataFinderByCity {
@@ -29,10 +31,11 @@ public class DataFinderByCity {
     private Context mContext;
     private List<WeatherDetails> mFetchedWeatherDetails;
     private DataFinder mDataFinder;
+    private int mPendingRequest = 0;
 
     public DataFinderByCity(@NonNull Context context, @NonNull DataFinder dataFinder) {
         this.mContext = context;
-        this. mDataFinder = dataFinder;
+        this.mDataFinder = dataFinder;
     }
 
     public void startDownloadingData(String[] data) {
@@ -46,21 +49,28 @@ public class DataFinderByCity {
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
+                            mPendingRequest--;
                             WeatherDetails item = MainHelper.getGson().fromJson(response, WeatherDetails.class);
                             if (item != null)
                                 mFetchedWeatherDetails.add(item);
 
-                            if (mDatatoFetch.length == position)
+                            if (mPendingRequest == 0)
                                 mDataFinder.onDataFinderCompleted(mFetchedWeatherDetails);
                         }
                     },
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
+                            mPendingRequest--;
                             mDataFinder.onDataError("Error in fetching data with: " + url);
                         }
                     });
             MyVolleySingleton.getInstance(mContext).addToRequestQueue(cityRequest);
+            mPendingRequest++;
         }
+    }
+
+    public boolean isRunning() {
+        return mPendingRequest > 0;
     }
 }

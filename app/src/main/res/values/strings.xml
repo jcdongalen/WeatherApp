@@ -3,6 +3,11 @@
     <string name="openweather_api_key">96bd3bd1c44d8a39187cfb5d7a381d1f</string>
     <string name="api_get_weather_by_city">http://api.openweathermap.org/data/2.5/weather?q=%s&amp;units=metric&amp;appid=%s</string>
     <string name="api_weather_icon">http://openweathermap.org/img/w/%s.png</string>
-    <string name="label_celcius">%.1f°c</string>
-    <string name="label_farengeight">%.1f°f</string>
+    <string name="label_celcius">%s°c</string>
+    <string name="label_farengeight">%s°f</string>
+    <string name="label_celsiua_and_farenheight">%s°C / %s°F</string>
+    <string name="label_degrees">%s°</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

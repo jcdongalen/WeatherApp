@@ -1,13 +1,23 @@
 package com.firex.media.weatherapp.Models;
 
+import java.io.Serializable;
 import java.util.List;
 
 public class WeatherDetails {
+    private int id;
     private Coord coord;
     private List<Weather> weather;
     private String name;
     private Main main;
     private Sys sys;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public Coord getCoord() {
         return coord;
@@ -49,7 +59,7 @@ public class WeatherDetails {
         this.sys = sys;
     }
 
-    public class Coord{
+    public class Coord {
         private float lon;
         private float lat;
 
@@ -70,7 +80,7 @@ public class WeatherDetails {
         }
     }
 
-    public class Weather{
+    public class Weather {
         private int id;
         private String main;
         private String description;
@@ -109,7 +119,7 @@ public class WeatherDetails {
         }
     }
 
-    public class Main{
+    public class Main {
         private float temp;
         private float pressure;
         private float humidity;
@@ -157,7 +167,7 @@ public class WeatherDetails {
         }
     }
 
-    public class Sys{
+    public class Sys {
         private int type;
         private int id;
         private float message;

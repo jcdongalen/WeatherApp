@@ -20,6 +20,6 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--keepclassmembers class com.firex.media.weatherapp.Models.* {
-   public *;
+-keepclassmembers class com.firex.media.weatherapp.** {
+   *;
 }
